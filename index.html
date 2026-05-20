@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Happy Birthday Akka</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    overflow:hidden;
+    background:black;
+    font-family:Arial,sans-serif;
+}
+
+canvas{
+    display:block;
+}
+
+/* =========================================
+   SIMPLE TEXT
+========================================= */
+
+#birthdayText{
+
+    position:absolute;
+
+    width:100%;
+
+    bottom:40px;
+
+    text-align:center;
+
+    color:white;
+
+    z-index:10;
+
+    opacity:0;
+
+    transition:3s;
+
+}
+
+#birthdayText.show{
+    opacity:1;
+}
+
+#birthdayText h1{
+
+    font-size:clamp(35px,6vw,80px);
+
+    letter-spacing:2px;
+
+    text-shadow:
+        0 0 10px rgba(255,255,255,0.9),
+        0 0 30px rgba(255,120,255,0.7);
+
+}
+
+#birthdayText p{
+
+    margin-top:15px;
+
+    font-size:clamp(16px,2vw,28px);
+
+    color:rgba(255,255,255,0.9);
+
+    line-height:1.6;
+
+    text-shadow:
+        0 0 10px rgba(255,255,255,0.5);
+
+}
+
+/* COUNTDOWN */
+
+#countdown{
+
+    position:absolute;
+
+    top:20px;
+
+    width:100%;
+
+    text-align:center;
+
+    color:white;
+
+    font-size:clamp(15px,2vw,26px);
+
+    z-index:10;
+
+    text-shadow:
+        0 0 10px rgba(255,255,255,0.6);
+
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- COUNTDOWN -->
+
+<div id="countdown">
+💍 Wedding Countdown:
+<span id="days"></span> Days
+</div>
+
+<!-- SIMPLE TEXT -->
+
+<div id="birthdayText">
+
+<h1>🎂 Happy Birthday Akka 💖</h1>
+
+<p>
+No matter where life takes you...<br>
+You’ll always be my favorite person ✨
+</p>
+
+</div>
+
+<!-- MUSIC -->
+
+<audio autoplay loop>
+<source src="music.mp3" type="audio/mpeg">
+</audio>
+
+<!-- THREE JS -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<script>
+
+/////////////////////////////////////////
+// COUNTDOWN
+/////////////////////////////////////////
+
+const weddingDate =
+new Date("2026-06-17");
+
+const today =
+new Date();
+
+const diff =
+weddingDate - today;
+
+const days =
+Math.ceil(diff/(1000*60*60*24));
+
+document.getElementById("days")
+.innerHTML = days;
+
+/////////////////////////////////////////
+// SCENE
+/////////////////////////////////////////
+
+let scene =
+new THREE.Scene();
+
+let camera =
+new THREE.PerspectiveCamera(
+
+75,
+window.innerWidth/window.innerHeight,
+0.1,
+3000
+
+);
+
+camera.position.z = 450;
+
+let renderer =
+new THREE.WebGLRenderer({
+
+antialias:true
+
+});
+
+renderer.setSize(
+window.innerWidth,
+window.innerHeight
+);
+
+renderer.setPixelRatio(
+window.devicePixelRatio
+);
+
+document.body.appendChild(
+renderer.domElement
+);
+
+/////////////////////////////////////////
+// GALAXY STARS
+/////////////////////////////////////////
+
+const starGeometry =
+new THREE.BufferGeometry();
+
+const starVertices = [];
+
+for(let i=0;i<10000;i++){
+
+starVertices.push(
+
+(Math.random()-0.5)*5000,
+(Math.random()-0.5)*5000,
+(Math.random()-0.5)*5000
+
+);
+
+}
+
+starGeometry.setAttribute(
+
+'position',
+
+new THREE.Float32BufferAttribute(
+starVertices,
+3
+)
+
+);
+
+const starMaterial =
+new THREE.PointsMaterial({
+
+color:0xffffff,
+size:2
+
+});
+
+const stars =
+new THREE.Points(
+
+starGeometry,
+starMaterial
+
+);
+
+scene.add(stars);
+
+/////////////////////////////////////////
+// SHOOTING STARS
+/////////////////////////////////////////
+
+let shootingStars = [];
+
+function createShootingStar(){
+
+const geometry =
+new THREE.BufferGeometry();
+
+geometry.setAttribute(
+
+'position',
+
+new THREE.Float32BufferAttribute(
+[0,0,0],
+3
+)
+
+);
+
+const material =
+new THREE.PointsMaterial({
+
+color:0xffffff,
+size:6
+
+});
+
+const star =
+new THREE.Points(
+geometry,
+material
+);
+
+star.position.set(
+
+-1500,
+Math.random()*800,
+Math.random()*500
+
+);
+
+scene.add(star);
+
+shootingStars.push(star);
+
+}
+
+setInterval(createShootingStar,2500);
+
+/////////////////////////////////////////
+// FIREWORKS
+/////////////////////////////////////////
+
+let fireworks = [];
+
+function createFirework(){
+
+let group = [];
+
+for(let i=0;i<180;i++){
+
+const geometry =
+new THREE.BufferGeometry();
+
+geometry.setAttribute(
+
+'position',
+
+new THREE.Float32BufferAttribute(
+[0,0,0],
+3
+)
+
+);
+
+const material =
+new THREE.PointsMaterial({
+
+color:new THREE.Color(
+`hsl(${Math.random()*360},100%,70%)`
+),
+
+size:4
+
+});
+
+const particle =
+new THREE.Points(
+geometry,
+material
+);
+
+particle.position.set(
+
+(Math.random()-0.5)*1200,
+(Math.random()-0.5)*600,
+(Math.random()-0.5)*500
+
+);
+
+particle.velocity = {
+
+x:(Math.random()-0.5)*7,
+y:(Math.random()-0.5)*7,
+z:(Math.random()-0.5)*7
+
+};
+
+scene.add(particle);
+
+group.push(particle);
+
+}
+
+fireworks.push(group);
+
+}
+
+setInterval(createFirework,3000);
+
+/////////////////////////////////////////
+// IMAGE PARTICLES
+/////////////////////////////////////////
+
+const image =
+new Image();
+
+image.src = "./akka.jpeg";
+
+image.onload = ()=>{
+
+const canvas =
+document.createElement("canvas");
+
+const ctx =
+canvas.getContext("2d");
+
+canvas.width = image.width;
+canvas.height = image.height;
+
+ctx.drawImage(image,0,0);
+
+const data =
+ctx.getImageData(
+
+0,
+0,
+image.width,
+image.height
+
+).data;
+
+let vertices = [];
+let colors = [];
+let targets = [];
+
+for(let y=0;y<image.height;y+=3){
+
+for(let x=0;x<image.width;x+=3){
+
+const index =
+(y*image.width + x)*4;
+
+const r = data[index];
+const g = data[index+1];
+const b = data[index+2];
+const a = data[index+3];
+
+if(a > 128){
+
+vertices.push(
+
+(Math.random()-0.5)*2500,
+(Math.random()-0.5)*2500,
+(Math.random()-0.5)*2500
+
+);
+
+targets.push({
+
+x:(x-image.width/2)*1.8,
+y:-(y-image.height/2)*1.8,
+z:0
+
+});
+
+colors.push(
+
+r/255,
+g/255,
+b/255
+
+);
+
+}
+
+}
+
+}
+
+const geometry =
+new THREE.BufferGeometry();
+
+geometry.setAttribute(
+
+'position',
+
+new THREE.Float32BufferAttribute(
+vertices,
+3
+)
+
+);
+
+geometry.setAttribute(
+
+'color',
+
+new THREE.Float32BufferAttribute(
+colors,
+3
+)
+
+);
+
+const material =
+new THREE.PointsMaterial({
+
+size:2.2,
+vertexColors:true
+
+});
+
+const points =
+new THREE.Points(
+geometry,
+material
+);
+
+scene.add(points);
+
+const positions =
+geometry.attributes.position.array;
+
+/////////////////////////////////////////
+// ANIMATION
+/////////////////////////////////////////
+
+function animate(){
+
+requestAnimationFrame(animate);
+
+/////////////////////////////////////////
+// CAMERA MOVEMENT
+/////////////////////////////////////////
+
+camera.position.x =
+Math.sin(Date.now()*0.0002)*45;
+
+camera.position.y =
+Math.cos(Date.now()*0.0003)*25;
+
+camera.position.z =
+450 + Math.sin(Date.now()*0.0005)*35;
+
+camera.lookAt(scene.position);
+
+/////////////////////////////////////////
+// STAR ROTATION
+/////////////////////////////////////////
+
+stars.rotation.x += 0.00015;
+stars.rotation.y += 0.00045;
+
+/////////////////////////////////////////
+// SHOOTING STARS
+/////////////////////////////////////////
+
+for(let i=0;i<shootingStars.length;i++){
+
+shootingStars[i].position.x += 18;
+
+shootingStars[i].position.y -= 7;
+
+if(shootingStars[i].position.x > 2000){
+
+scene.remove(shootingStars[i]);
+
+shootingStars.splice(i,1);
+
+}
+
+}
+
+/////////////////////////////////////////
+// FIREWORKS
+/////////////////////////////////////////
+
+fireworks.forEach(group=>{
+
+group.forEach(p=>{
+
+p.position.x += p.velocity.x;
+p.position.y += p.velocity.y;
+p.position.z += p.velocity.z;
+
+p.material.size *= 0.992;
+
+});
+
+});
+
+/////////////////////////////////////////
+// PHOTO FORMATION
+/////////////////////////////////////////
+
+for(let i=0;i<targets.length;i++){
+
+positions[i*3] +=
+(targets[i].x - positions[i*3])*0.02;
+
+positions[i*3+1] +=
+(targets[i].y - positions[i*3+1])*0.02;
+
+positions[i*3+2] +=
+(targets[i].z - positions[i*3+2])*0.02;
+
+}
+
+geometry.attributes.position
+.needsUpdate = true;
+
+/////////////////////////////////////////
+// PARTICLE GLOW
+/////////////////////////////////////////
+
+points.material.size =
+2.2 + Math.sin(Date.now()*0.003)*0.4;
+
+renderer.render(scene,camera);
+
+}
+
+animate();
+
+/////////////////////////////////////////
+// SHOW TEXT
+/////////////////////////////////////////
+
+setTimeout(()=>{
+
+document
+.getElementById("birthdayText")
+.classList.add("show");
+
+},7000);
+
+};
+
+/////////////////////////////////////////
+// RESIZE
+/////////////////////////////////////////
+
+window.addEventListener("resize",()=>{
+
+camera.aspect =
+window.innerWidth/window.innerHeight;
+
+camera.updateProjectionMatrix();
+
+renderer.setSize(
+window.innerWidth,
+window.innerHeight
+);
+
+});
+
+</script>
+
+</body>
+</html>
